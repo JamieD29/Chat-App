@@ -3,17 +3,71 @@ import Victory from "@/assets/victory.svg";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-
 import { useState } from "react";
+import { toast } from "sonner";
+import { apiClient } from "@/lib/api-client";
+import { SIGNUP_ROUTE } from "../../utils/constant";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleLogin = async()=>{};
-  const handleSignup = async()=>{};
+  const validateSignup = () => {
+    if (!email.length) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!password.length) {
+      toast.error("Password is required");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Password and Confirm password should be same");
+      return false;
+    }
+    return true;
+  };
+
+  const handleLogin = async () => {};
+  const handleSignup = async () => {
+    if (validateSignup()) {
+      try {
+        const response = await apiClient.post(SIGNUP_ROUTE, {
+          email,
+          password,
+        });
+
+        // Kiểm tra nếu yêu cầu thành công
+        if (response.status === 200 || response.status === 201) {
+          toast.success("Registration successful ️🎉");
+          console.log("Signup successful:", response.data);
+          // Thực hiện các hành động khác khi đăng ký thành công
+        } else {
+          toast.error("Signup unsuccessful");
+          console.error("Unexpected status code:", response.status);
+          // Xử lý trường hợp khi mã trạng thái không phải là 200 hoặc 201
+        }
+      } catch (error) {
+        if (error.response) {
+          // Server trả về phản hồi với mã lỗi không phải 2xx
+          console.error("Error response status:", error.response.status);
+          console.error("Error response data:", error.response.data);
+          // Xử lý lỗi tùy thuộc vào mã trạng thái
+          if (error.response.status === 400) {
+            toast.error("Something went wrong");
+            console.error("Bad Request: Invalid data submitted.");
+          } else if (error.response.status === 401) {
+            toast.error("Something went wrong");
+            console.error("Unauthorized: Invalid credentials.");
+          } else if (error.response.status === 500) {
+            toast.error("Something went wrong");
+            console.error("Server Error: Please try again later.");
+          }
+        }
+      }
+    }
+  };
 
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">
@@ -50,14 +104,14 @@ const Auth = () => {
                   type="email"
                   className="rounded-full p-6"
                   value={email}
-                  onChange={(e) => setEmail(e.target.email)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
                   placeholder="Password"
                   type="password"
                   className="rounded-full p-6"
                   value={password}
-                  onChange={(e) => setPassword(e.target.password)}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Button className="rounded-full p-6" onClick={handleLogin}>
                   Login
@@ -69,21 +123,21 @@ const Auth = () => {
                   type="email"
                   className="rounded-full p-6"
                   value={email}
-                  onChange={(e) => setEmail(e.target.email)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
                   placeholder="Password"
                   type="password"
                   className="rounded-full p-6"
                   value={password}
-                  onChange={(e) => setPassword(e.target.password)}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Input
                   placeholder="Confirm Password"
                   type="password"
                   className="rounded-full p-6"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.confirmPassword)}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <Button className="rounded-full p-6" onClick={handleSignup}>
                   Signup
