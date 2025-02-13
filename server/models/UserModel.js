@@ -13,11 +13,11 @@ const userSchema = new mongoose.Schema({
   },
   firstName: {
     type: String,
-    required: [false, "First name is required."],
+    required: false,
   },
   lastName: {
     type: String,
-    required: [false, "Last name is required."],
+    required: false,
   },
   image: {
     type: String,
