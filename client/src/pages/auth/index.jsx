@@ -7,12 +7,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
 import { LOGIN_ROUTE, SIGNUP_ROUTE } from "../../utils/constant";
-import {useNavigate} from 'react-router-dom'
-import { userAppStore } from "../../store";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../../store";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const {setUserInfo} = userAppStore;
+  const { setUserInfo } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,7 +26,7 @@ const Auth = () => {
       toast.error("Password is required");
       return false;
     }
-  return true;
+    return true;
   };
 
   const validateSignup = () => {
@@ -56,26 +56,23 @@ const Auth = () => {
           },
           { withCredentials: true }
         );
-          if(response.data.user.id){
-            setUserInfo(response.data.user);
+
+        if (response.data.user.id) {
+          toast.success("Access successful ️🎉");
+          console.log("Login successful:", response.data);
+          setUserInfo(response.data.user);
+          if (response.data.user.profileSetup) {
+            navigate("/chat");
+          } else {
+            navigate("/profile");
           }
-         if (response.status === 200 || response.status === 201) {
-           toast.success("Access successful ️🎉");
-           console.log("Login successful:", response.data);
-           // Thực hiện các hành động khác khi đăng ký thành công
-           if(response.data.user.id){
-            if(response.data.user.profileSetup) navigate("/chat");
-            else navigate("/profile");
-           }
-         } else {
-           toast.error("Login unsuccessful");
-           console.error("Unexpected status code:", response.status);
-           // Xử lý trường hợp khi mã trạng thái không phải là 200 hoặc 201
-         }
+        } else {
+          toast.error("Login unsuccessful");
+          console.error("Unexpected status code:", response.status);
+        }
       } catch (error) {
         console.error("Error response status:", error.response.status);
         console.error("Error response data:", error.response.data);
-        // Xử lý lỗi tùy thuộc vào mã trạng thái
         if (error.response.status === 400) {
           toast.error("Something went wrong");
           console.error("Bad Request: Invalid data submitted.");

@@ -1,13 +1,13 @@
-import { userAppStore } from "../../store";
+import { useAppStore } from "../../store";
 
 const Profile = () => {
-  const { userInfo } = userAppStore;
+  const { userInfo } = useAppStore();
   return (
     <>
       <div>Profile</div>
-      <div>Email: {userInfo.email}</div>
+      <div>Email: {userInfo.id}</div>
     </>
   );
 };
-//1:50:00
+
 export default Profile;
